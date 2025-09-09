@@ -1,10 +1,10 @@
 package com.example.aula17.data_layer
 
-class PacienteRepository(private val pacienteDao: PacienteDao) {
-    val allItems = pacienteDao.getAllItems()
+class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
+    val allItems = disciplinaDao.getAllItems()
 
-    suspend fun insert(paciente: Paciente) {
-        pacienteDao.insert(paciente)
+    suspend fun insert(disciplina: Disciplina) {
+        disciplinaDao.insert(disciplina)
     }
 //
 //    suspend fun update(item: Item) {
