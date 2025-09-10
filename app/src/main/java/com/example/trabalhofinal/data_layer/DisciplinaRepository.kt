@@ -18,8 +18,8 @@ class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
 //    suspend fun clearAll(){
 //        itemDao.clearAll()
 //    }
-//    suspend fun updateComprado(id: Int, comprado: Boolean){
-//        itemDao.updateComprado(id,comprado)
-//    }
+    suspend fun updateFavoritado(id: Int, favoritado: Boolean){
+        disciplinaDao.updateFavoritado(id,favoritado)
+    }
 
 }
