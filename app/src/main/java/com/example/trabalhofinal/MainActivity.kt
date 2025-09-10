@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,13 +23,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,6 +60,7 @@ class MainActivity : ComponentActivity() {
 
 data class MeuUiState(
     val lista: List<DisciplinaComNotas> = listOf(),
+    val showDialog: Boolean = false // State to control dialog visibility
 )
 
 class MeuViewModel(application: Application) : AndroidViewModel(application) {
@@ -80,6 +85,9 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun botaoAddDisciplina(){
+        _uiState.update { it.copy(showDialog = true) }
+    }
     fun insereDisciplina() {
         viewModelScope.launch {
             disciplinaRepository.insert(
@@ -89,7 +97,55 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
                 )
             )
         }
+        botaoSair()
     }
+
+    fun botaoSair(){
+        _uiState.update { it.copy(showDialog = false) }
+    }
+}
+
+
+@Composable
+fun AlertDialogExample(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Confirmar")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Sair")
+            }
+        }
+    )
 }
 
 @Composable
@@ -162,7 +218,7 @@ fun Home(meuViewModel: MeuViewModel = viewModel()) {
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { meuViewModel.insereDisciplina() }) {
+            FloatingActionButton(onClick = { meuViewModel.botaoAddDisciplina() }) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
@@ -174,6 +230,15 @@ fun Home(meuViewModel: MeuViewModel = viewModel()) {
         ) {
 
             ListaDisciplinas(listaDisciplinas = uiState.lista)
+        }
+        if (uiState.showDialog){
+            AlertDialogExample(
+                onDismissRequest = {  meuViewModel.botaoSair()},
+                onConfirmation = { meuViewModel.insereDisciplina() },
+                dialogTitle = "Nova Disciplina",
+                dialogText = "Deseja inserir qual disciplina?",
+                icon = Icons.Default.Add
+            )
         }
     }
 }
