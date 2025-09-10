@@ -12,6 +12,7 @@ import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Database(entities = [Disciplina::class, Nota::class], version = 1)
@@ -51,12 +52,12 @@ data class DisciplinaComNotas(
 
 @Dao
 interface DisciplinaDao {
-    @Query("SELECT * FROM Disciplina")
+    @Query("SELECT * FROM Disciplina ORDER BY favoritada DESC")
     fun getAllItems(): Flow<List<DisciplinaComNotas>>
     @Insert
     suspend fun insert(disciplina: Disciplina)
-//    @Update
-//    suspend fun update(item: Item)
+    @Query("UPDATE Disciplina SET favoritada = :favoritado WHERE id = :id")
+    suspend fun updateFavoritado(id: Int, favoritado: Boolean)
 //
     @Query("DELETE FROM disciplina WHERE id = :id")
     suspend fun deleteById(id: Int)

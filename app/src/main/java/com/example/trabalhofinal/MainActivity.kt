@@ -15,6 +15,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
@@ -32,7 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -112,6 +114,12 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
             disciplinaRepository.deleteById(id)
         }
     }
+
+    fun toggleFavoritado(disciplina: Disciplina){
+        viewModelScope.launch {
+            disciplinaRepository.updateFavoritado(disciplina.id, !disciplina.favoritada)
+        }
+    }
 }
 
 
@@ -123,7 +131,7 @@ fun AlertDialogExample(
     dialogText: String,
     icon: ImageVector,
 ) {
-    val userInput = remember { mutableStateOf("") }
+    val userInput = rememberSaveable { mutableStateOf("") }
 
     AlertDialog(
         icon = {
@@ -162,7 +170,9 @@ fun AlertDialogExample(
 
 @Composable
 fun ListaDisciplinas(
-    listaDisciplinas: List<DisciplinaComNotas>,     onDeleteDisciplina: (Int) -> Unit,
+    listaDisciplinas: List<DisciplinaComNotas>,
+    onDeleteDisciplina: (Int) -> Unit,
+    onFavoritarDisciplina: (Disciplina) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -191,8 +201,15 @@ fun ListaDisciplinas(
                         ,
                     ) {
                         Text(text = element.disciplina.nome, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(10.dp))
-                        IconButton(onClick = {  onDeleteDisciplina(element.disciplina.id)  }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+
+                        Row (horizontalArrangement = Arrangement.End) {
+                            IconButton(onClick = { onDeleteDisciplina(element.disciplina.id) }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                            }
+                            //resolver toggle aqui
+                            IconButton(onClick = { onFavoritarDisciplina( element.disciplina) }) {
+                                Icon(imageVector = if (element.disciplina.favoritada) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+                            }
                         }
                     }
                 }
@@ -244,7 +261,7 @@ fun Home(meuViewModel: MeuViewModel = viewModel()) {
                 .padding(20.dp)
         ) {
 
-            ListaDisciplinas(listaDisciplinas = uiState.lista, onDeleteDisciplina = { id -> meuViewModel.deletaDisciplina(id) })
+            ListaDisciplinas(listaDisciplinas = uiState.lista, onDeleteDisciplina = { id -> meuViewModel.deletaDisciplina(id) }, onFavoritarDisciplina = { disciplina -> meuViewModel.toggleFavoritado(disciplina)})
         }
         if (uiState.showDialog){
             AlertDialogExample(
