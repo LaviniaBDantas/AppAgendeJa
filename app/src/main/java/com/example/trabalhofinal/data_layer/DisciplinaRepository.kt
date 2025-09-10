@@ -11,10 +11,10 @@ class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
 //        itemDao.update(item)
 //    }
 //
-//    /* ... */
-//    suspend fun deleteById(id: Int) {
-//        itemDao.deleteById(id)
-//    }
+    /* ... */
+    suspend fun deleteById(id: Int) {
+        disciplinaDao.deleteById(id)
+    }
 //    suspend fun clearAll(){
 //        itemDao.clearAll()
 //    }

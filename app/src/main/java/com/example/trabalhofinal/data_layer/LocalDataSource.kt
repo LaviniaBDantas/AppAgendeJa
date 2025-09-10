@@ -58,8 +58,8 @@ interface DisciplinaDao {
 //    @Update
 //    suspend fun update(item: Item)
 //
-//    @Query("DELETE FROM item WHERE id = :id")
-//    suspend fun deleteById(id: Int)
+    @Query("DELETE FROM disciplina WHERE id = :id")
+    suspend fun deleteById(id: Int)
 }
 
 @Dao

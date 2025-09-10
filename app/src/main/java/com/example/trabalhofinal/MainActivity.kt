@@ -14,12 +14,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -62,8 +64,8 @@ class MainActivity : ComponentActivity() {
 
 data class MeuUiState(
     val lista: List<DisciplinaComNotas> = listOf(),
-    val showDialog: Boolean = false // State to control dialog visibility
-)
+    val showDialog: Boolean = false, // State to control dialog visibility
+    )
 
 class MeuViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(MeuUiState())
@@ -104,6 +106,11 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
 
     fun botaoSair(){
         _uiState.update { it.copy(showDialog = false) }
+    }
+    fun deletaDisciplina(id: Int){
+        viewModelScope.launch {
+            disciplinaRepository.deleteById(id)
+        }
     }
 }
 
@@ -155,7 +162,7 @@ fun AlertDialogExample(
 
 @Composable
 fun ListaDisciplinas(
-    listaDisciplinas: List<DisciplinaComNotas>,
+    listaDisciplinas: List<DisciplinaComNotas>,     onDeleteDisciplina: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -184,6 +191,9 @@ fun ListaDisciplinas(
                         ,
                     ) {
                         Text(text = element.disciplina.nome, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(10.dp))
+                        IconButton(onClick = {  onDeleteDisciplina(element.disciplina.id)  }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
                     }
                 }
             }
@@ -234,7 +244,7 @@ fun Home(meuViewModel: MeuViewModel = viewModel()) {
                 .padding(20.dp)
         ) {
 
-            ListaDisciplinas(listaDisciplinas = uiState.lista)
+            ListaDisciplinas(listaDisciplinas = uiState.lista, onDeleteDisciplina = { id -> meuViewModel.deletaDisciplina(id) })
         }
         if (uiState.showDialog){
             AlertDialogExample(
