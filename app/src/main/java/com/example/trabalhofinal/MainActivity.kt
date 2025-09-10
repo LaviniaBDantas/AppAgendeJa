@@ -24,15 +24,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -88,11 +90,11 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
     fun botaoAddDisciplina(){
         _uiState.update { it.copy(showDialog = true) }
     }
-    fun insereDisciplina() {
+    fun insereDisciplina(disciplinaInserida : String    ) {
         viewModelScope.launch {
             disciplinaRepository.insert(
                 disciplina = Disciplina(
-                    nome = "PDM",
+                    nome = disciplinaInserida,
                     favoritada = false
                 )
             )
@@ -109,11 +111,13 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
 @Composable
 fun AlertDialogExample(
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
+    onConfirmation: (String) -> Unit,
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector,
 ) {
+    val userInput = remember { mutableStateOf("") }
+
     AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -123,6 +127,7 @@ fun AlertDialogExample(
         },
         text = {
             Text(text = dialogText)
+            TextField(value = userInput.value, onValueChange = { userInput.value = it })
         },
         onDismissRequest = {
             onDismissRequest()
@@ -130,7 +135,7 @@ fun AlertDialogExample(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onConfirmation()
+                    onConfirmation(userInput.value)
                 }
             ) {
                 Text("Confirmar")
@@ -234,7 +239,7 @@ fun Home(meuViewModel: MeuViewModel = viewModel()) {
         if (uiState.showDialog){
             AlertDialogExample(
                 onDismissRequest = {  meuViewModel.botaoSair()},
-                onConfirmation = { meuViewModel.insereDisciplina() },
+                onConfirmation = { disciplinaInserida->meuViewModel.insereDisciplina(disciplinaInserida) },
                 dialogTitle = "Nova Disciplina",
                 dialogText = "Deseja inserir qual disciplina?",
                 icon = Icons.Default.Add
