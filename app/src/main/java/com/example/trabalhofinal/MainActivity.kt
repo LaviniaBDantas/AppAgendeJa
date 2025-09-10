@@ -1,5 +1,5 @@
 package com.example.trabalhofinal
-import androidx.lifecycle.viewmodel.compose.viewModel
+import android.R.attr.onClick
 import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,8 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,9 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
-import com.example.aula17.data_layer.Paciente
-import com.example.aula17.data_layer.PacienteRepository
+import com.example.aula17.data_layer.Disciplina
+import com.example.aula17.data_layer.DisciplinaComNotas
+import com.example.aula17.data_layer.DisciplinaRepository
 import com.example.aula17.data_layer.TrabFinalDatabase
 import com.example.trabalhofinal.ui.theme.TrabalhoFinalTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,14 +56,14 @@ class MainActivity : ComponentActivity() {
 }
 
 data class MeuUiState(
-    val lista: List<Paciente> = listOf(),
+    val lista: List<DisciplinaComNotas> = listOf(),
 )
 
 class MeuViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(MeuUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val pacienteRepository: PacienteRepository
+    private val disciplinaRepository: DisciplinaRepository
 
     init {
         val db = Room.databaseBuilder(
@@ -65,9 +71,9 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
             TrabFinalDatabase::class.java,
             "meu_app_database"
         ).build()
-        pacienteRepository = PacienteRepository(db.pacienteDao())
+        disciplinaRepository = DisciplinaRepository(db.disciplinaDao())
         viewModelScope.launch {
-            pacienteRepository.allItems.collect { listaDB ->
+            disciplinaRepository.allItems.collect { listaDB ->
                 _uiState.update {
                     it.copy(lista = listaDB)
                 }
@@ -75,14 +81,12 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun inserePaciente() {
+    fun insereDisciplina() {
         viewModelScope.launch {
-            pacienteRepository.insert(
-                paciente = Paciente(
-                    nome = "João da Silva",
-                    endereco = "Rua A, 123",
-                    telefone = "99999-9999",
-                    foto = ""
+            disciplinaRepository.insert(
+                disciplina = Disciplina(
+                    nome = "PDM",
+                    favoritada = false
                 )
             )
         }
@@ -90,8 +94,8 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
 }
 
 @Composable
-fun ListaPacientes(
-    listaPacientes: List<Paciente>,
+fun ListaDisciplinas(
+    listaDisciplinas: List<DisciplinaComNotas>,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -101,10 +105,10 @@ fun ListaPacientes(
             .verticalScroll(scrollState)
             .padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        if (listaPacientes.isEmpty()) {
+        if (listaDisciplinas.isEmpty()) {
             Text("Lista vazia")
         } else {
-            listaPacientes.forEach { element ->
+            listaDisciplinas.forEach { element ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -117,10 +121,7 @@ fun ListaPacientes(
                             .fillMaxWidth()
                             .padding(start = 10.dp),
                     ) {
-                        Text(text = element.cpf.toString())
-                        Text(text = element.nome)
-                        Text(text = element.endereco)
-                        Text(text = element.telefone)
+                        Text(text = element.disciplina.nome)
                     }
                 }
             }
@@ -141,7 +142,7 @@ fun MinhaTela(meuViewModel: MeuViewModel = viewModel()) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Lista de Pacientes",
+                    text = "Lista de Disciplinas",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -149,17 +150,24 @@ fun MinhaTela(meuViewModel: MeuViewModel = viewModel()) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Botão para inserir um novo paciente
-                Button(
-                    onClick = { meuViewModel.inserePaciente() },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Adicionar Novo Paciente")
-                }
+
+                    FloatingActionButton(
+                        onClick = { meuViewModel.insereDisciplina() },
+                    ) {
+                        Icon(Icons.Filled.Add, "Floating action button.")
+                    }
+
+//                Button(
+//                    onClick = { meuViewModel.insereDisciplina() },
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    Text(text = "Adicionar Nova Disciplina")
+//                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Exibe a lista de pacientes
-                ListaPacientes(listaPacientes = uiState.lista)
+                ListaDisciplinas(listaDisciplinas = uiState.lista)
             }
         }
     }
