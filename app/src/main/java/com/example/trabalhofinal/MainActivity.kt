@@ -46,7 +46,9 @@ import androidx.room.Room
 import com.example.aula17.data_layer.Disciplina
 import com.example.aula17.data_layer.DisciplinaComNotas
 import com.example.aula17.data_layer.DisciplinaRepository
+import com.example.aula17.data_layer.Nota
 import com.example.aula17.data_layer.TrabFinalDatabase
+import com.example.trabalhofinal.data_layer.NotaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -73,6 +75,8 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
 
     private val disciplinaRepository: DisciplinaRepository
 
+    private val notaRepository: NotaRepository
+
     init {
         val db = Room.databaseBuilder(
             application.applicationContext,
@@ -80,6 +84,7 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
             "meu_app_database"
         ).build()
         disciplinaRepository = DisciplinaRepository(db.disciplinaDao())
+        notaRepository = NotaRepository(db.notaDao())
         viewModelScope.launch {
             disciplinaRepository.allItems.collect { listaDB ->
                 _uiState.update {
@@ -110,6 +115,28 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
     fun deletaDisciplina(id: Int){
         viewModelScope.launch {
             disciplinaRepository.deleteById(id)
+        }
+    }
+
+    fun insereNota (texto: String, idDisciplina: Int){
+        viewModelScope.launch {
+            val novaNota = Nota(
+                texto = texto,
+                idDisciplina = idDisciplina
+            )
+            notaRepository.insert(novaNota)
+        }
+    }
+
+    fun deletaNota(id: Int){
+        viewModelScope.launch {
+            notaRepository.deleteById(id)
+        }
+    }
+
+    fun deletaTodasAsNotas(){
+        viewModelScope.launch {
+            notaRepository.deleteAll()
         }
     }
 }

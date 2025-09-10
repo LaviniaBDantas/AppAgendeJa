@@ -12,6 +12,7 @@ import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Database(entities = [Disciplina::class, Nota::class], version = 1)
@@ -66,11 +67,16 @@ interface DisciplinaDao {
 interface NotaDao {
     @Query("SELECT * FROM Nota")
     fun getAllItems(): Flow<List<Nota>>
-    /*@Insert
-    suspend fun insert(item: Item)
-    @Update
-    suspend fun update(item: Item)
-    /* ... */
-    @Query("DELETE FROM item WHERE id = :id")
-    suspend fun deleteById(id: Int)*/
+
+    @Insert
+    suspend fun insert(nota: Nota)
+
+//    @Update
+//    suspend fun update(nota: Nota)
+
+    @Query("DELETE FROM nota WHERE idDisciplina = :id")
+    suspend fun deleteById(id: Int)
+
+    @Query("DELETE FROM nota")
+    suspend fun deleteAllNotes()
 }
