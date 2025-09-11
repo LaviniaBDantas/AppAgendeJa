@@ -1,6 +1,4 @@
-package com.example.aula17.data_layer
-
-import androidx.room.ColumnInfo
+package com.example.trabalhofinal.data_layer
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Embedded
@@ -11,7 +9,6 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.RoomDatabase
-import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Database(entities = [Disciplina::class, Nota::class], version = 1)
@@ -51,26 +48,41 @@ data class DisciplinaComNotas(
 
 @Dao
 interface DisciplinaDao {
-    @Query("SELECT * FROM Disciplina")
+    @Query("SELECT * FROM Disciplina ORDER BY favoritada DESC")
     fun getAllItems(): Flow<List<DisciplinaComNotas>>
+
     @Insert
     suspend fun insert(disciplina: Disciplina)
-//    @Update
-//    suspend fun update(item: Item)
-//
-//    @Query("DELETE FROM item WHERE id = :id")
-//    suspend fun deleteById(id: Int)
+
+    @Query("UPDATE Disciplina SET favoritada = :favoritado WHERE id = :id")
+    suspend fun updateFavoritado(id: Int, favoritado: Boolean)
+
+    //
+    @Query("DELETE FROM disciplina WHERE id = :id")
+    suspend fun deleteById(id: Int)
+
+    @Query("SELECT * FROM disciplina WHERE id = :disciplinaId")
+    fun getNotasByDisciplinaId(disciplinaId: Int): Flow<List<DisciplinaComNotas>>
+
+    @Query("SELECT nome FROM disciplina WHERE id = :disciplinaId")
+    fun getNomeDisciplina(disciplinaId: Int): Flow<String>
+
 }
 
 @Dao
 interface NotaDao {
     @Query("SELECT * FROM Nota")
     fun getAllItems(): Flow<List<Nota>>
-    /*@Insert
-    suspend fun insert(item: Item)
-    @Update
-    suspend fun update(item: Item)
-    /* ... */
-    @Query("DELETE FROM item WHERE id = :id")
-    suspend fun deleteById(id: Int)*/
+
+    @Insert
+    suspend fun insert(nota: Nota)
+
+//    @Update
+//    suspend fun update(nota: Nota)
+
+    @Query("DELETE FROM Nota WHERE id = :id")
+    suspend fun deleteById(id: Int)
+
+    @Query("DELETE FROM Nota")
+    suspend fun deleteAllNotes()
 }

@@ -1,4 +1,6 @@
-package com.example.aula17.data_layer
+package com.example.trabalhofinal.data_layer
+
+import kotlinx.coroutines.flow.Flow
 
 class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
     val allItems = disciplinaDao.getAllItems()
@@ -11,15 +13,22 @@ class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
 //        itemDao.update(item)
 //    }
 //
-//    /* ... */
-//    suspend fun deleteById(id: Int) {
-//        itemDao.deleteById(id)
-//    }
+    /* ... */
+    suspend fun deleteById(id: Int) {
+        disciplinaDao.deleteById(id)
+    }
 //    suspend fun clearAll(){
 //        itemDao.clearAll()
 //    }
-//    suspend fun updateComprado(id: Int, comprado: Boolean){
-//        itemDao.updateComprado(id,comprado)
-//    }
+    suspend fun updateFavoritado(id: Int, favoritado: Boolean){
+        disciplinaDao.updateFavoritado(id,favoritado)
+    }
 
+    fun getNotesByDisciplina(disciplinaId: Int): Flow<List<DisciplinaComNotas>> {
+        return disciplinaDao.getNotasByDisciplinaId(disciplinaId)
+    }
+
+    fun getNameDisciplinaById(disciplinaId: Int): Flow<String> {
+        return disciplinaDao.getNomeDisciplina(disciplinaId)
+    }
 }
