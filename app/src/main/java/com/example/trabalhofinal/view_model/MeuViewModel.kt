@@ -104,4 +104,8 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
     fun getNomeDisciplina(idDisciplina: Int): Flow<String> {
         return disciplinaRepository.getNameDisciplinaById(idDisciplina)
     }
+
+    fun getNoteById(id :Int): Flow<Nota>{
+        return notaRepository.getNoteById(id)
+    }
 }

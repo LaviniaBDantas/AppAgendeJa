@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.trabalhofinal.screens.Home
 import com.example.trabalhofinal.screens.TelaNotas
+import com.example.trabalhofinal.screens.ViewNote
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +29,14 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("notas/{disciplinaId}") { backStackEntry ->
                     val disciplinaId = backStackEntry.arguments?.getString("disciplinaId")?.toInt() ?: 0
-                    TelaNotas(disciplinaId = disciplinaId)
+                    TelaNotas(
+                        disciplinaId = disciplinaId,
+                        navToNote = { notaId -> navController.navigate("viewnote/$notaId") }
+                    )
+                }
+                composable("viewnote/{notaId}") { backStackEntry ->
+                    val notaId = backStackEntry.arguments?.getString("notaId")?.toInt() ?: 0
+                    ViewNote(notaId = notaId)
                 }
             }
         }

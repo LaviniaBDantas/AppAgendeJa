@@ -1,5 +1,6 @@
 package com.example.trabalhofinal.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import java.util.Locale
 fun ListaNotas(
     listaNotas: List<DisciplinaComNotas>,
     onDeleteNota: (Int) -> Unit,
+    onClickNote: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -58,6 +60,8 @@ fun ListaNotas(
                     modifier = Modifier
                         .padding(bottom = 16.dp)
                         .fillMaxWidth()
+                        .clickable { onClickNote(nota.id) }
+
                 ) {
                     Row(
                         modifier = Modifier
@@ -96,6 +100,7 @@ fun ListaNotas(
 @Composable
 fun TelaNotas(
     meuViewModel: MeuViewModel = viewModel(),
+    navToNote: (Int) -> Unit,
     disciplinaId: Int
 ) {
 
@@ -131,7 +136,7 @@ fun TelaNotas(
             FloatingActionButton(
                 onClick = {
                     meuViewModel.insereNota(
-                        texto = "Interessante",
+                    texto = "Dúvida em programação linear",
                         idDisciplina = disciplinaId
                     )
                 }
@@ -147,7 +152,8 @@ fun TelaNotas(
         ) {
             ListaNotas(
                 listaNotas = notas,
-                onDeleteNota = { id -> meuViewModel.deletaNota(id) }
+                onDeleteNota = { id -> meuViewModel.deletaNota(id) },
+                onClickNote = { id -> navToNote(id) }
             )
         }
     }
