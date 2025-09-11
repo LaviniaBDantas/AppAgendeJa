@@ -1,6 +1,4 @@
-package com.example.aula17.data_layer
-
-import androidx.room.ColumnInfo
+package com.example.trabalhofinal.data_layer
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Embedded
@@ -11,8 +9,6 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.RoomDatabase
-import androidx.room.Transaction
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Database(entities = [Disciplina::class, Nota::class], version = 1)

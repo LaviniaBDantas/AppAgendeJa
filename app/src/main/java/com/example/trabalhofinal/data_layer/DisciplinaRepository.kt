@@ -1,4 +1,4 @@
-package com.example.aula17.data_layer
+package com.example.trabalhofinal.data_layer
 
 class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
     val allItems = disciplinaDao.getAllItems()

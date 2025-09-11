@@ -1,7 +1,7 @@
 package com.example.trabalhofinal.data_layer
 
-import com.example.aula17.data_layer.Nota
-import com.example.aula17.data_layer.NotaDao
+import com.example.trabalhofinal.data_layer.Nota
+import com.example.trabalhofinal.data_layer.NotaDao
 
 
 class NotaRepository (private val notaDao: NotaDao){
