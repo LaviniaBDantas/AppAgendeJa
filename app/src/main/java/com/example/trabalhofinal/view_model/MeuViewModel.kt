@@ -76,7 +76,7 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun insereNota (texto: String, idDisciplina: Int){
+    fun insertNote (texto: String, idDisciplina: Int){
         viewModelScope.launch {
             val novaNota = Nota(
                 texto = texto,
@@ -86,22 +86,22 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deletaNota(id: Int){
+    fun deleteNote(id: Int){
         viewModelScope.launch {
             notaRepository.deleteById(id)
         }
     }
 
-    fun deletaTodasAsNotas(){
+    fun deleteAllNotesByDisciplina(idDisciplina: Int){
         viewModelScope.launch {
-            notaRepository.deleteAll()
+            notaRepository.deleteAllNotesByDisciplina(idDisciplina)
         }
     }
-    fun getNotasDasDisciplinas(idDisciplina: Int): Flow<List<DisciplinaComNotas>> {
+    fun getNotesByDisciplina(idDisciplina: Int): Flow<List<DisciplinaComNotas>> {
         return disciplinaRepository.getNotesByDisciplina(idDisciplina)
     }
 
-    fun getNomeDisciplina(idDisciplina: Int): Flow<String> {
+    fun getNameDisciplina(idDisciplina: Int): Flow<String> {
         return disciplinaRepository.getNameDisciplinaById(idDisciplina)
     }
 

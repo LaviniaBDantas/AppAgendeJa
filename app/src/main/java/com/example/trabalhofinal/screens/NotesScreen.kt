@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,7 @@ import java.util.Locale
 
 
 @Composable
-fun ListaNotas(
+fun ListNotes(
     listaNotas: List<DisciplinaComNotas>,
     onDeleteNota: (Int) -> Unit,
     onClickNote: (Int) -> Unit,
@@ -98,26 +99,36 @@ fun ListaNotas(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TelaNotas(
+fun TelaShowNotes(
     meuViewModel: MeuViewModel = viewModel(),
     navToNote: (Int) -> Unit,
+    navToInsert: (Int) -> Unit,
     disciplinaId: Int
 ) {
 
-    val disciplinaNome by meuViewModel.getNomeDisciplina(disciplinaId)
+    val disciplinaNome by meuViewModel.getNameDisciplina(disciplinaId)
         .collectAsStateWithLifecycle(initialValue = "")
 
-    val notas by meuViewModel.getNotasDasDisciplinas(disciplinaId)
+    val notas by meuViewModel.getNotesByDisciplina(disciplinaId)
         .collectAsStateWithLifecycle(initialValue = emptyList())
 
     Scaffold(
         topBar = {
             TopAppBar(
+                title = { Text("Notas de $disciplinaNome") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("Notas de $disciplinaNome") }
+                actions = {
+                    IconButton(onClick = { meuViewModel.deleteAllNotesByDisciplina(disciplinaId) }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Apagar todas as notas de $disciplinaNome",
+                            tint = Color.Red
+                        )
+                    }
+                }
             )
         },
         bottomBar = {
@@ -128,18 +139,13 @@ fun TelaNotas(
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    text = "Aq vai ficar nossa barra de navegacao",
+                    text = "Barra de navegacao",
                 )
             }
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    meuViewModel.insereNota(
-                    texto = "Dúvida em programação linear",
-                        idDisciplina = disciplinaId
-                    )
-                }
+                onClick = { navToInsert(disciplinaId) }
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
@@ -150,9 +156,9 @@ fun TelaNotas(
                 .padding(innerPadding)
                 .padding(20.dp)
         ) {
-            ListaNotas(
+            ListNotes(
                 listaNotas = notas,
-                onDeleteNota = { id -> meuViewModel.deletaNota(id) },
+                onDeleteNota = { id -> meuViewModel.deleteNote(id) },
                 onClickNote = { id -> navToNote(id) }
             )
         }

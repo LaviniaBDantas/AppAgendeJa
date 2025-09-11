@@ -4,12 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.trabalhofinal.screens.Home
-import com.example.trabalhofinal.screens.TelaNotas
-import com.example.trabalhofinal.screens.ViewNote
+import com.example.trabalhofinal.screens.TelaInsertNote
+import com.example.trabalhofinal.screens.TelaShowNotes
+import com.example.trabalhofinal.screens.TelaViewNote
+import com.example.trabalhofinal.view_model.MeuViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -29,14 +32,29 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("notas/{disciplinaId}") { backStackEntry ->
                     val disciplinaId = backStackEntry.arguments?.getString("disciplinaId")?.toInt() ?: 0
-                    TelaNotas(
+                    TelaShowNotes(
                         disciplinaId = disciplinaId,
-                        navToNote = { notaId -> navController.navigate("viewnote/$notaId") }
+                        navToNote = { notaId -> navController.navigate("viewnote/$notaId") },
+                        // Linha corrigida abaixo:
+                        navToInsert = { idDaDisciplina -> navController.navigate("telaInsertNote/$idDaDisciplina") }
                     )
                 }
                 composable("viewnote/{notaId}") { backStackEntry ->
                     val notaId = backStackEntry.arguments?.getString("notaId")?.toInt() ?: 0
-                    ViewNote(notaId = notaId)
+                    TelaViewNote(notaId = notaId)
+                }
+
+                composable("telaInsertNote/{disciplinaId}") { backStackEntry ->
+                    val disciplinaId = backStackEntry.arguments?.getString("disciplinaId")?.toInt() ?: -1
+                    val meuViewModel: MeuViewModel = viewModel()
+
+                    TelaInsertNote(
+                        disciplinaId = disciplinaId,
+                        meuViewModel = meuViewModel,
+                        onNoteSaved = {
+                            navController.popBackStack()
+                        }
+                    )
                 }
             }
         }

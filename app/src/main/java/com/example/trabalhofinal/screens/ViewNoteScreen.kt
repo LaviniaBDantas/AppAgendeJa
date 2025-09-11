@@ -17,7 +17,7 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewNote(
+fun TelaViewNote(
     notaId: Int,
     meuViewModel: MeuViewModel = viewModel(),
     onBack: () -> Unit = {}
