@@ -50,13 +50,23 @@ data class DisciplinaComNotas(
 interface DisciplinaDao {
     @Query("SELECT * FROM Disciplina ORDER BY favoritada DESC")
     fun getAllItems(): Flow<List<DisciplinaComNotas>>
+
     @Insert
     suspend fun insert(disciplina: Disciplina)
+
     @Query("UPDATE Disciplina SET favoritada = :favoritado WHERE id = :id")
     suspend fun updateFavoritado(id: Int, favoritado: Boolean)
-//
+
+    //
     @Query("DELETE FROM disciplina WHERE id = :id")
     suspend fun deleteById(id: Int)
+
+    @Query("SELECT * FROM disciplina WHERE id = :disciplinaId")
+    fun getNotasByDisciplinaId(disciplinaId: Int): Flow<List<DisciplinaComNotas>>
+
+    @Query("SELECT nome FROM disciplina WHERE id = :disciplinaId")
+    fun getNomeDisciplina(disciplinaId: Int): Flow<String>
+
 }
 
 @Dao
@@ -70,9 +80,9 @@ interface NotaDao {
 //    @Update
 //    suspend fun update(nota: Nota)
 
-    @Query("DELETE FROM nota WHERE idDisciplina = :id")
+    @Query("DELETE FROM Nota WHERE id = :id")
     suspend fun deleteById(id: Int)
 
-    @Query("DELETE FROM nota")
+    @Query("DELETE FROM Nota")
     suspend fun deleteAllNotes()
 }

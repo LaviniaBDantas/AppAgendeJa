@@ -1,5 +1,6 @@
 package com.example.trabalhofinal.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,6 +44,7 @@ fun ListaDisciplinas(
     listaDisciplinas: List<DisciplinaComNotas>,
     onDeleteDisciplina: (Int) -> Unit,
     onFavoritarDisciplina: (Disciplina) -> Unit,
+    onClickDisciplina: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -50,7 +52,8 @@ fun ListaDisciplinas(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         if (listaDisciplinas.isEmpty()) {
             Text("Lista vazia")
@@ -60,25 +63,36 @@ fun ListaDisciplinas(
                     modifier = Modifier
                         .padding(bottom = 16.dp)
                         .fillMaxWidth()
+                        .clickable { onClickDisciplina(element.disciplina.id) }
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-//                            .background(color = MaterialTheme.colorScheme.primaryContainer)
                             .fillMaxWidth()
                             .padding(start = 10.dp)
-                        ,
                     ) {
-                        Text(text = element.disciplina.nome, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(10.dp))
+                        Text(
+                            text = element.disciplina.nome,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(10.dp)
+                        )
 
-                        Row (horizontalArrangement = Arrangement.End) {
+                        Row(horizontalArrangement = Arrangement.End) {
                             IconButton(onClick = { onDeleteDisciplina(element.disciplina.id) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete"
+                                )
                             }
-                            //resolver toggle aqui
-                            IconButton(onClick = { onFavoritarDisciplina( element.disciplina) }) {
-                                Icon(imageVector = if (element.disciplina.favoritada) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+                            IconButton(onClick = { onFavoritarDisciplina(element.disciplina) }) {
+                                Icon(
+                                    imageVector = if (element.disciplina.favoritada)
+                                        Icons.Default.Favorite
+                                    else
+                                        Icons.Default.FavoriteBorder,
+                                    contentDescription = "Favorite"
+                                )
                             }
                         }
                     }
@@ -88,15 +102,18 @@ fun ListaDisciplinas(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Home(meuViewModel: MeuViewModel = viewModel()) {
+fun Home(
+    meuViewModel: MeuViewModel = viewModel(),
+    navToNotas: (Int) -> Unit
+) {
     val uiState by meuViewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                colors = topAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
@@ -111,31 +128,39 @@ fun Home(meuViewModel: MeuViewModel = viewModel()) {
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
                 Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     text = "Aq vai ficar nossa barra de navegacao",
                 )
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { meuViewModel.botaoAddDisciplina() }) {
+            FloatingActionButton(
+                onClick = { meuViewModel.botaoAddDisciplina() }
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
-    ) {  innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(20.dp)
         ) {
-
-            ListaDisciplinas(listaDisciplinas = uiState.lista, onDeleteDisciplina = { id -> meuViewModel.deletaDisciplina(id) }, onFavoritarDisciplina = { disciplina -> meuViewModel.toggleFavoritado(disciplina)})
+            ListaDisciplinas(
+                listaDisciplinas = uiState.lista,
+                onDeleteDisciplina = { id -> meuViewModel.deletaDisciplina(id) },
+                onFavoritarDisciplina = { disciplina -> meuViewModel.toggleFavoritado(disciplina) },
+                onClickDisciplina = { id -> navToNotas(id) }
+            )
         }
-        if (uiState.showDialog){
+
+        if (uiState.showDialog) {
             AlertDialogExample(
-                onDismissRequest = {  meuViewModel.botaoSair()},
-                onConfirmation = { disciplinaInserida->meuViewModel.insereDisciplina(disciplinaInserida) },
+                onDismissRequest = { meuViewModel.botaoSair() },
+                onConfirmation = { disciplinaInserida ->
+                    meuViewModel.insereDisciplina(disciplinaInserida)
+                },
                 dialogTitle = "Nova Disciplina",
                 dialogText = "Deseja inserir qual disciplina?",
                 icon = Icons.Default.Add

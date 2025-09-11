@@ -10,6 +10,7 @@ import com.example.trabalhofinal.data_layer.DisciplinaRepository
 import com.example.trabalhofinal.data_layer.Nota
 import com.example.trabalhofinal.data_layer.TrabFinalDatabase
 import com.example.trabalhofinal.data_layer.NotaRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -95,5 +96,12 @@ class MeuViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             notaRepository.deleteAll()
         }
+    }
+    fun getNotasDasDisciplinas(idDisciplina: Int): Flow<List<DisciplinaComNotas>> {
+        return disciplinaRepository.getNotesByDisciplina(idDisciplina)
+    }
+
+    fun getNomeDisciplina(idDisciplina: Int): Flow<String> {
+        return disciplinaRepository.getNameDisciplinaById(idDisciplina)
     }
 }

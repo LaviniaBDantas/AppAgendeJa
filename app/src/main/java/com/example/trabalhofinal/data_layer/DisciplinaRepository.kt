@@ -1,5 +1,7 @@
 package com.example.trabalhofinal.data_layer
 
+import kotlinx.coroutines.flow.Flow
+
 class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
     val allItems = disciplinaDao.getAllItems()
 
@@ -22,4 +24,11 @@ class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
         disciplinaDao.updateFavoritado(id,favoritado)
     }
 
+    fun getNotesByDisciplina(disciplinaId: Int): Flow<List<DisciplinaComNotas>> {
+        return disciplinaDao.getNotasByDisciplinaId(disciplinaId)
+    }
+
+    fun getNameDisciplinaById(disciplinaId: Int): Flow<String> {
+        return disciplinaDao.getNomeDisciplina(disciplinaId)
+    }
 }

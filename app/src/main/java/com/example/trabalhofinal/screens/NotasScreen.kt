@@ -6,10 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -23,63 +19,70 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trabalhofinal.data_layer.DisciplinaComNotas
 import com.example.trabalhofinal.view_model.MeuViewModel
-import kotlin.collections.forEach
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
 fun ListaNotas(
-    listaNotas: List<DisciplinaComNotas>, onDeleteNota: (Int) -> Unit,
+    listaNotas: List<DisciplinaComNotas>,
+    onDeleteNota: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scrollState = rememberScrollState()
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (listaNotas.isEmpty()) {
+        // Pega a disciplina em questão
+        val disciplina = listaNotas.firstOrNull()
+
+        if (disciplina == null || disciplina.notas.isEmpty()) {
             Text("Sem anotações dessa disciplina")
         } else {
-            listaNotas.forEach { element ->
+            disciplina.notas.forEach { nota ->
                 Card(
                     modifier = Modifier
                         .padding(bottom = 16.dp)
                         .fillMaxWidth()
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-//                            .background(color = MaterialTheme.colorScheme.primaryContainer)
                             .fillMaxWidth()
-                            .padding(start = 10.dp)
-                        ,
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                        val dataFormatada = formatter.format(Date(nota.dataCriacao))
 
-                        LazyColumn {
-                            items(element.notas) { nota ->
-                                Text(
-                                    text = "${nota.texto} - ${nota.dataCriacao}",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.padding(10.dp)
-                                )
-                            }
+                        Column {
+                            Text(
+                                text = dataFormatada,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Text(
+                                text = nota.texto,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
-                        IconButton(onClick = {  onDeleteNota(element.disciplina.id)  }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        IconButton(onClick = { onDeleteNota(nota.id) }) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
                         }
                     }
                 }
@@ -89,21 +92,27 @@ fun ListaNotas(
 }
 
 
-@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TelaNotas(meuViewModel: MeuViewModel = viewModel()) {
-    val uiState by meuViewModel.uiState.collectAsStateWithLifecycle()
+fun TelaNotas(
+    meuViewModel: MeuViewModel = viewModel(),
+    disciplinaId: Int
+) {
+
+    val disciplinaNome by meuViewModel.getNomeDisciplina(disciplinaId)
+        .collectAsStateWithLifecycle(initialValue = "")
+
+    val notas by meuViewModel.getNotasDasDisciplinas(disciplinaId)
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
     Scaffold(
         topBar = {
             TopAppBar(
-                colors = topAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = {
-                    Text("Notas da disciplina")
-                }
+                title = { Text("Notas de $disciplinaNome") }
             )
         },
         bottomBar = {
@@ -112,26 +121,36 @@ fun TelaNotas(meuViewModel: MeuViewModel = viewModel()) {
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
                 Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     text = "Aq vai ficar nossa barra de navegacao",
                 )
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { meuViewModel.insereNota(texto = "Interessante", idDisciplina = 1) }) {
+            FloatingActionButton(
+                onClick = {
+                    meuViewModel.insereNota(
+                        texto = "Interessante",
+                        idDisciplina = disciplinaId
+                    )
+                }
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
-    ) {  innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(20.dp)
         ) {
-
-            ListaNotas(listaNotas = uiState.lista, onDeleteNota = { id -> meuViewModel.deletaDisciplina(id) })
+            ListaNotas(
+                listaNotas = notas,
+                onDeleteNota = { id -> meuViewModel.deletaNota(id) }
+            )
         }
     }
 }
+
+
