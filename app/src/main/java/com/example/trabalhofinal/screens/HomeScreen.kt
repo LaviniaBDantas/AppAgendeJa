@@ -33,14 +33,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.trabalhofinal.components.AlertDialogExample
+import com.example.trabalhofinal.components.AlertDialog
 import com.example.trabalhofinal.data_layer.Disciplina
 import com.example.trabalhofinal.data_layer.DisciplinaComNotas
 import com.example.trabalhofinal.view_model.MeuViewModel
 
 
 @Composable
-fun ListaDisciplinas(
+fun ListDisciplinas(
     listaDisciplinas: List<DisciplinaComNotas>,
     onDeleteDisciplina: (Int) -> Unit,
     onFavoritarDisciplina: (Disciplina) -> Unit,
@@ -132,18 +132,6 @@ fun Home(
             )
         },
 
-//        bottomBar = {
-//            BottomAppBar(
-//                containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                contentColor = MaterialTheme.colorScheme.primary,
-//            ) {
-//                Text(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    textAlign = TextAlign.Center,
-//                    text = "Aq vai ficar nossa barra de navegacao",
-//                )
-//            }
-//        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { meuViewModel.botaoAddDisciplina() }
@@ -157,7 +145,7 @@ fun Home(
                 .padding(innerPadding)
                 .padding(20.dp)
         ) {
-            ListaDisciplinas(
+            ListDisciplinas(
                 listaDisciplinas = uiState.lista,
                 onDeleteDisciplina = { id -> meuViewModel.deletaDisciplina(id) },
                 onFavoritarDisciplina = { disciplina -> meuViewModel.toggleFavoritado(disciplina) },
@@ -166,7 +154,7 @@ fun Home(
         }
 
         if (uiState.showDialog) {
-            AlertDialogExample(
+            AlertDialog(
                 onDismissRequest = { meuViewModel.botaoSair() },
                 onConfirmation = { disciplinaInserida ->
                     meuViewModel.insereDisciplina(disciplinaInserida)
