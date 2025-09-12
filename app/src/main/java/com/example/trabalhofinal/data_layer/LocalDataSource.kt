@@ -67,6 +67,9 @@ interface DisciplinaDao {
     @Query("SELECT nome FROM disciplina WHERE id = :disciplinaId")
     fun getNomeDisciplina(disciplinaId: Int): Flow<String>
 
+    @Query("SELECT * FROM disciplina WHERE nome LIKE '%' || :nomeBuscado || '%'")
+    fun searchDisciplina(nomeBuscado: String): Flow<List<Disciplina>>
+
 }
 
 @Dao

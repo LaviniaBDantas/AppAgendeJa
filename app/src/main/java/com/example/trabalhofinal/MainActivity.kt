@@ -9,11 +9,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.trabalhofinal.screens.Home
+import com.example.trabalhofinal.screens.SearchScreen
 import com.example.trabalhofinal.screens.TelaInsertNote
 import com.example.trabalhofinal.screens.TelaShowNotes
 import com.example.trabalhofinal.screens.TelaViewNote
 import com.example.trabalhofinal.view_model.MeuViewModel
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +27,9 @@ class MainActivity : ComponentActivity() {
                     Home(
                         navToNotas = { disciplinaId ->
                             navController.navigate("notas/$disciplinaId")
+                        },
+                        navToSearch = { // 🔹 passa a navegação de pesquisa
+                            navController.navigate("pesquisa")
                         }
                     )
                 }
@@ -54,6 +57,16 @@ class MainActivity : ComponentActivity() {
                         onNoteSaved = {
                             navController.popBackStack()
                         }
+                    )
+                }
+                composable("pesquisa") {
+                    val meuViewModel: MeuViewModel = viewModel()
+
+                    SearchScreen(
+                        viewModel = meuViewModel,
+                        onClickDisciplina = { id -> navController.navigate("notas/$id") },
+                        onFavoritar = { disciplina -> meuViewModel.toggleFavoritado(disciplina) },
+                        onDeletar = { disciplina -> meuViewModel.deletaDisciplina(disciplina.id) },
                     )
                 }
             }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -26,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,7 +48,6 @@ fun ListNotes(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Pega a disciplina em questão
         val disciplina = listaNotas.firstOrNull()
 
         if (disciplina == null || disciplina.notas.isEmpty()) {
@@ -70,13 +67,14 @@ fun ListNotes(
                             .padding(10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                        val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
                         val dataFormatada = formatter.format(Date(nota.dataCriacao))
 
                         Column {
                             Text(
                                 text = dataFormatada,
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = nota.texto,
@@ -131,18 +129,18 @@ fun TelaShowNotes(
                 }
             )
         },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Barra de navegacao",
-                )
-            }
-        },
+//        bottomBar = {
+//            BottomAppBar(
+//                containerColor = MaterialTheme.colorScheme.primaryContainer,
+//                contentColor = MaterialTheme.colorScheme.primary,
+//            ) {
+//                Text(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    textAlign = TextAlign.Center,
+//                    text = "Barra de navegacao",
+//                )
+//            }
+//        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navToInsert(disciplinaId) }

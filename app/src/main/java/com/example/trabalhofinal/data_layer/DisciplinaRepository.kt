@@ -31,4 +31,8 @@ class DisciplinaRepository(private val disciplinaDao: DisciplinaDao) {
     fun getNameDisciplinaById(disciplinaId: Int): Flow<String> {
         return disciplinaDao.getNomeDisciplina(disciplinaId)
     }
+
+    fun searchDisciplina(nomeBuscado: String): Flow<List<Disciplina>> {
+        return disciplinaDao.searchDisciplina(nomeBuscado)
+    }
 }

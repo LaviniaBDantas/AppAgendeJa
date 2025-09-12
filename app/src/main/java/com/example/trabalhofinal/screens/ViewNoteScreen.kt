@@ -61,7 +61,6 @@ fun TelaViewNote(
                 val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
                 val dataFormatada = formatter.format(Date(nota.dataCriacao))
 
-                // Data em destaque
                 Text(
                     text = dataFormatada,
                     style = MaterialTheme.typography.labelLarge,
@@ -70,7 +69,6 @@ fun TelaViewNote(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Card com o conteúdo da nota
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
